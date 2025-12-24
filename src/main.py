@@ -15,15 +15,13 @@ from database.database import create_tables
 from checks import check_admin
 from buttons import render_main_menu
 from commands.institutions import register_institution_comands
+from redis_client.client import redis_connection
 
 
 bot = AsyncTeleBot(
     token=getenv('BOT_TOKEN'),
     parse_mode="markdown"
 )
-
-event_handlers(bot)
-register_institution_comands(bot)
 
 
 @bot.message_handler(commands=['start'])
@@ -44,7 +42,10 @@ async def handle_cancel_commands(message: Message, state: StateContext):
     )
 
 async def main():
+    event_handlers(bot)
+    await register_institution_comands(bot)
     await create_tables()
+    await redis_connection()
     await bot.infinity_polling()
 
 if __name__ == '__main__':
