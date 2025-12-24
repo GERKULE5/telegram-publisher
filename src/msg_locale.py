@@ -1,3 +1,4 @@
+# src/msg_locale.py
 class CommandDescription:
     user_commands = {
         'start': '▶️ Запуск бота'

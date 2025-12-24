@@ -1,3 +1,4 @@
+# src/database/models.py
 from sqlalchemy import Column, Integer, String, Text, BigInteger, ForeignKey
 from sqlalchemy.orm import relationship, DeclarativeBase
 
@@ -14,7 +15,6 @@ class Institution(Base):
     __tablename__ = 'institutions'
     id = Column(Integer, primary_key=True)
     institutionName = Column(Text, nullable=False)
-    code = Column(String(11), nullable=False, unique=True)
     channels = relationship("Channel", back_populates="institution")
 
 class Channel(Base):

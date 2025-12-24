@@ -1,3 +1,4 @@
+# src/chat_events.py
 from telebot.types import ChatMemberUpdated
 
 def event_handlers(bot):
