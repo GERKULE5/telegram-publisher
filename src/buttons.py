@@ -1,3 +1,4 @@
+# src/buttons.py
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
 from msg_locale import ButtonMessages, CommonMessages
