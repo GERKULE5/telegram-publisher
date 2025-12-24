@@ -18,13 +18,16 @@ def register_institution_comands(bot):
     @bot.message_handler(func=lambda m: m.text == ButtonMessages.LOGIN_INSTITUTION)
     async def login_institution(message: Message, state: StateContext):
         await state.set(InstitutionCodeState.waiting_for_code)
+        current_state = await bot.get_state(message.from_user.id, message.chat.id)
+        print(f'State: {current_state}')
         await bot.send_message(message.chat.id, InstitutionMessages.CODE_MESSAGE, reply_markup=render_cancel_button())
 
     @bot.message_handler(state=InstitutionCodeState.waiting_for_code)
     async def process_login_institution(message: Message, state: StateContext):
         text = message.text
+        print(text)
         user_id = message.from_user.id
-        institution = await get_institution_by_code(text)
+        institution = None
 
         if institution is not None:
             await state.delete()

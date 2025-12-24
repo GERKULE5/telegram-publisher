@@ -32,6 +32,11 @@ bot = AsyncTeleBot(
 from telebot.states.asyncio.middleware import StateMiddleware
 bot.setup_middleware(StateMiddleware(bot))
 
+from telebot import asyncio_filters
+bot.add_custom_filter(asyncio_filters.StateFilter(bot))
+
+
+
 @bot.message_handler(commands=['start'])
 async def start(message: Message):
     chat_id = message.chat.id
