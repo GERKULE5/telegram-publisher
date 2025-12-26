@@ -8,6 +8,7 @@ from msg_locale import ButtonMessages, InstitutionMessages, CommonMessages
 from buttons import render_main_menu, render_cancel_button
 from database.dao import get_institution_by_code
 from checks import check_admin
+from chat_events import event_handlers
 
 class InstitutionCodeState(StatesGroup):
         waiting_for_code = State()
@@ -27,11 +28,19 @@ def register_institution_comands(bot):
         text = message.text
         print(text)
         user_id = message.from_user.id
-        institution = None
+        
 
-        if institution is not None:
-            await state.delete()
-            print(f'User: {user_id} added Insititution: {institution.id} with code: {institution.code}')
+        # kafka logic:
+
+        code = "q3L44erVC"
+        status = "OK"
+        print('Python producer sent the message to Node.js consumer')
+        print(f'Node.js consumer recieved the message from Python producer: code - {code}')
+        print('Node.js Producer sent the message to Python consumer')
+        print(f'Python consumer recieved the message from Node.js producer: status - {status}')
+
+        if status == 'OK':
+            await bot.send_message(message.chat.id, InstitutionMessages.ADD_TO_CHAT)
             return
         else:
             await bot.send_message(message.chat.id, InstitutionMessages.INSTITUTION_NOT_FOUND)

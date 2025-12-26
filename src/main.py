@@ -19,6 +19,20 @@ from checks import check_admin
 from buttons import render_main_menu
 from commands.institutions import register_institution_comands
 from redis_client.client import redis_connection
+from kafka.manager import KafkaManager
+
+
+
+kafka_manager = None
+
+async def handle_kafka_response(response):
+    from commands.institutions import process_auth_response
+    await process_auth_response(bot, response)
+
+async def initialize_kafka():
+    global kafka_manager
+    kafka_manager = await KafkaManager().initialize(handle_kafka_response)
+    return kafka_manager
 
 
 state_storage = StateMemoryStorage() # В проде поменять на Redis!!
@@ -75,8 +89,15 @@ async def echo_all(message: Message):
 async def main():
     await create_tables()
     await redis_connection()
-    await bot.infinity_polling()
-    
+
+    await initialize_kafka()
+
+    try:
+        await bot.infinity_polling()
+    finally:
+        if kafka_manager:
+            # Stoping kafka
+            pass
 
 
 if __name__ == '__main__':
