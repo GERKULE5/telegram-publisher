@@ -1,0 +1,32 @@
+version: "3.4"
+
+services:
+  database:
+    image: mysql
+    restart: unless-stopped
+    container_name: database
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=core
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    container_name: phpmyadmin
+    ports:
+      - 8080:80
+    depends_on:
+      - database
+    links:
+      - database:db
+    environment:
+      - UPLOAD_LIMIT=300M
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - 6379:6379
