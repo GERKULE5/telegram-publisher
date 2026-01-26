@@ -18,7 +18,6 @@ from database.database import create_tables
 from checks import check_admin
 from buttons import render_main_menu
 from commands.institutions import register_institution_comands
-from redis_client.client import redis_connection
 
 
 state_storage = StateMemoryStorage() # В проде поменять на Redis!!
@@ -74,7 +73,6 @@ async def echo_all(message: Message):
 
 async def main():
     await create_tables()
-    await redis_connection()
     await bot.infinity_polling()
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
 # src/redis_client/client.py
-import asyncio
 import redis.asyncio as aioredis
+from telebot.types import Message
 
 from os import getenv
 from dotenv import load_dotenv
@@ -11,21 +11,28 @@ load_dotenv()
 redis_url = getenv("REDIS_URL")
 print(redis_url)
 
-
-
-async def redis_connection():
-
-    redis = aioredis.from_url(
+redis = aioredis.from_url(
         redis_url,
         decode_responses = True
     )
 
-
+async def authorize(token: str, message: Message)-> bool:
     async with redis.client() as conn:
-        ok = await conn.execute_command("set", "my_key", "some_value")
-        assert ok is True
+        redis_token = await redis.hgetall(f'sync_tokens:{token}')
+        print(redis_token)
 
-        str_value = await conn.execute_command("get", "my_key")
-        assert str_value == "some_value"
-        print(str_value)
+        await redis.set(
+            'tg_user_id', message.from_user.id,
+            'chat_id', message.chat.id
+        )
+
+        redis_token = await redis.hgetall(f'sync_tokens:{token}')
+        print(redis_token)
+
+        if redis_token:
+            return redis_token
+        return None
+
+
+
 
