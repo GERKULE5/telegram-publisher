@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  bot:
+    container_name: telegram-publisher
+    build: 
+      context: .
+      dockerfile: dockerfile
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL: ${DATABASE_URL}
+      - REDIS_URL: ${REDIS_URL}
+      - KAFKA_URL: ${KAFKA_URL}
+  kafka: 
+    container_name: kafka
+    build: 
+      context: .
+      dockerfile: dockerfile
+    restart: unless-stopped
+    ports:
+      -
