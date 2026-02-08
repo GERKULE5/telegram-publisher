@@ -14,7 +14,8 @@ class NewsKafkaService:
         try:
             self.producer = AIOKafkaProducer(
                 bootstrap_servers=self.url,
-                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+                value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+                acks=1
             )
 
             self.consumer = AIOKafkaConsumer(
@@ -35,6 +36,11 @@ class NewsKafkaService:
             raise RuntimeError("Producer not started")
         
         result_send = await self.producer.send_and_wait(topic, message)
+
+        print("Flushing producer...")
+        await self.producer.flush()
+        print("Flush completed")
+
         print(result_send)
         print(f"Message sent to {topic}: {message}")
 

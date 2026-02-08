@@ -36,13 +36,12 @@ def register_institution_comands(bot, news):
         
         sync_data = TokenValidationRequest(
              token = token,
-             platform = 'telegram',
              externalUserId = user_id,
              externalChatId = chat_id
         )
 
         
-        await news.send('news.synchronized', sync_data.json())
+        await news.send('news.synchronized', sync_data.model_dump(mode='json'))
 
         print(f'sync data: {sync_data}\n{type(sync_data)}')
         # kafka logic:
