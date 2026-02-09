@@ -16,6 +16,7 @@ from database.dao import authorize_user
 
 class InstitutionCodeState(StatesGroup):
         waiting_for_code = State()
+        waiting_for_join = State()
 
 
 def register_institution_comands(bot, news):
@@ -32,27 +33,4 @@ def register_institution_comands(bot, news):
         token = message.text
         print(token)
         user_id = message.from_user.id
-        chat_id = message.chat.id
-        
-        sync_data = TokenValidationRequest(
-             token = token,
-             externalUserId = user_id,
-             externalChatId = chat_id
-        )
-
-        
-        await news.send('news.synchronized', sync_data.model_dump(mode='json'))
-
-        print(f'sync data: {sync_data}\n{type(sync_data)}')
-        # kafka logic:
-        
-
-        
-        status = 'ok'
-
-        if status == 'ok':
-            await bot.send_message(message.chat.id, InstitutionMessages.ADD_TO_CHAT)
-            return
-        else:
-            await bot.send_message(message.chat.id, InstitutionMessages.INSTITUTION_NOT_FOUND)
-            await state.delete()
+        chat_id = message.chat.id        
