@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 from database.database import async_connection
-from database.models import Admin, Institution, Channel
+from database.models import Admin, Channel, AuthorizedUser
 
 
 
@@ -17,18 +17,10 @@ async def get_admin(session: AsyncSession, user_id: int):
     except SQLAlchemyError as e:
         print(f'Error: {e}')
 
-    
-@async_connection
-async def get_institution_by_code(session: AsyncSession, code: str):
+@async_connection 
+async def authorize_user(session: AsyncSession, user: AuthorizedUser):
     try:
-        stmt = select(Institution).where(Institution.code==code)
-        result = await session.execute(stmt)
-        institution = result.scalar_one_or_none()
-        return institution
+        return await session.add(user)
     except SQLAlchemyError as e:
-        await session.rollback()
         print(f'Error: {e}')
-        return None
-
-
-
+        session.rollback()

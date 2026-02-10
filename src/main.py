@@ -18,7 +18,8 @@ from database.database import create_tables
 from checks import check_admin
 from buttons import render_main_menu
 from commands.institutions import register_institution_comands
-from redis_client.client import redis_connection
+
+from kafka.sync_news import NewsKafkaService
 
 
 state_storage = StateMemoryStorage() # В проде поменять на Redis!!
@@ -29,12 +30,17 @@ bot = AsyncTeleBot(
     parse_mode="markdown"
 )
 
+news = NewsKafkaService(
+    url=getenv('KAFKA_URL'),
+    topic='news.synchronized'
+)
+
+
 from telebot.states.asyncio.middleware import StateMiddleware
 bot.setup_middleware(StateMiddleware(bot))
 
 from telebot import asyncio_filters
 bot.add_custom_filter(asyncio_filters.StateFilter(bot))
-
 
 
 @bot.message_handler(commands=['start'])
@@ -56,7 +62,7 @@ async def handle_cancel_commands(message: Message, state: StateContext):
 
 
 event_handlers(bot)
-register_institution_comands(bot)
+register_institution_comands(bot, news)
 
 
 @bot.message_handler(func=lambda m: True)
@@ -73,11 +79,20 @@ async def echo_all(message: Message):
     )
 
 async def main():
+    
     await create_tables()
-    await redis_connection()
-    await bot.infinity_polling()
+    try:
+        await news.start()
+    except Exception as e:
+        print(f'Failed to start kafka')
+
+    try: 
+        await bot.infinity_polling()
+    except Exception as e:
+        print(e)
+    finally:
+        await news.stop()
+    
 
 if __name__ == '__main__':
     asyncio.run(main())
-
-
